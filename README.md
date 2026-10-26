@@ -76,7 +76,7 @@ Codex is a natural fit for MCPify in a few ways:
 3. **Run as MCP inside Codex** - connect the generated MCP server so Codex can call real tools, inspect app surfaces, and operate against the compiled environment.
 
 ## Features
-- **Backend Analyzer:** Deep AST analysis of routes, controllers, and services to surface every callable action.
+- **Backend Analyzer:** Deep AST analysis of routes, controllers, and services to surface every callable action. Framework-aware for Express, Fastify, NestJS, and Next.js — including inline, non-exported handlers.
 - **Frontend Action Extraction:** React, Vue, Svelte components mapped to agent-controllable actions.
 - **OpenAPI → MCP:** Drop in a spec, ship a typed MCP server in seconds.
 - **Workflow Engine:** Multi-step processes detected and exposed as atomic agent capabilities.
@@ -93,7 +93,7 @@ Codex is a natural fit for MCPify in a few ways:
 The easiest way to use MCPify is via `npx`. No installation required:
 
 ```bash
-npx mcpify-cli analyze .
+npx mcpify-cli analyze ./my-app
 ```
 
 To run it against the flagship ecommerce example in this repo:
@@ -149,11 +149,18 @@ npx mcpify-cli analyze . \
 ```
 
 Useful flags:
-- `--output <dir>` change output directory
+- `--output <dir>` change output directory (default: `./.mcpify`)
 - `--no-frontend` skip UI action extraction
 - `--no-events` skip webhook and listener analysis
 - `--no-workflows` skip workflow detection
+- `--reachable-only` emit only externally-reachable backend actions (skip internal helpers)
 - `--ai-enhance` improve tool descriptions (requires `ANTHROPIC_API_KEY`)
+- `--swagger <file>` analyze an OpenAPI/Swagger spec
+- `--prisma <file>` analyze a Prisma schema file
+- `--drizzle <path>` analyze Drizzle table definitions
+- `--mongoose <path>` analyze Mongoose schema/model files
+- `--no-install` skip auto-registration into AI clients
+- `--clients <list>` clients to register: `codex`, `claude-code`, `claude-desktop`, `vscode`, or `all` (default: `all`)
 
 ### `interactive`
 
@@ -179,9 +186,17 @@ Converts an OpenAPI or Swagger spec directly into MCP tools.
 npx mcpify-cli swagger ./tests/fixtures/swagger/petstore.yaml
 ```
 
-### `audit [path]` & `simulate [path]`
+### `audit [path]`
 
-Run a static safety audit over the discovered tools and workflows. When `ANTHROPIC_API_KEY` is available, `simulate` executes an AI simulation battery against the discovered tool surface.
+Static safety audit over the discovered tools and workflows — no files written.
+
+```bash
+npx mcpify-cli audit ./examples/express-api
+```
+
+### `simulate [path]`
+
+When `ANTHROPIC_API_KEY` is set, runs an AI simulation battery against the compiled tool surface.
 
 ```bash
 npx mcpify-cli simulate ./examples/express-api
